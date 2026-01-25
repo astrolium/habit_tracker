@@ -5,14 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Habit Tracker</title>
     <style>
+        /* --- THEME VARIABLES --- */
         :root {
+            /* Light Theme (Original) */
             --primary: #6366f1;
             --bg: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #9ca3af;
             --success-bg: #d1fae5;
-            --success-text: #065f46;
+            --success-text: #059669;
+            --ring-track: #e5e7eb;
+            --border-color: #e5e7eb;
+            --btn-hover: #f9fafb;
+            --header-color: #1f2937;
+        }
+
+        /* Dark Theme Overrides */
+        [data-theme="dark"] {
+            --primary: #818cf8; 
+            --bg: #111827;      
+            --card-bg: #1f2937; 
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --success-bg: #064e3b;
+            --success-text: #6ee7b7;
+            --ring-track: #374151;
+            --border-color: #374151;
+            --btn-hover: #374151;
+            --header-color: #f9fafb;
         }
 
         * {
@@ -29,31 +50,123 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
             width: 100%;
-            max-width: 650px; /* Slightly wider to fit 4 buttons comfortably */
+            max-width: 650px;
             display: flex;
             flex-direction: column;
             gap: 24px;
+            position: relative;
         }
 
         h1 {
             text-align: center;
             font-size: 1.75rem;
-            margin: 10px 0 20px 0;
+            margin: 10px 0 0 0;
             font-weight: 800;
+            color: var(--header-color);
         }
 
-        /* --- Responsive Grid --- */
+        /* --- THEME TOGGLE --- */
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- DASHBOARD (RINGS) --- */
+        .dashboard {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .ring-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 12px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .progress-ring__circle-bg {
+            stroke: var(--ring-track);
+            transition: stroke 0.3s;
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s ease-out, stroke 0.3s;
+            transform-origin: 50% 50%;
+        }
+
+        .ring-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ring-count {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--primary);
+        }
+
+        .ring-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .dashboard-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* --- BUTTON GRID --- */
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Mobile: 2 columns */
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
         
-        /* Laptop/Tablet: Switch to 4 columns */
         @media (min-width: 600px) {
             .button-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -62,16 +175,16 @@
 
         .habit-btn {
             background-color: var(--card-bg);
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 10px;
-            height: 90px; /* Slightly taller for better touch target */
+            height: 90px;
             font-size: 0.95rem;
             font-weight: 600;
             color: var(--text-main);
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: transform 0.1s, background-color 0.2s;
+            transition: transform 0.1s, background-color 0.2s, border-color 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -86,7 +199,7 @@
 
         .habit-btn:active {
             transform: scale(0.96);
-            background-color: #f9fafb;
+            background-color: var(--btn-hover);
         }
 
         @media (hover: hover) {
@@ -96,18 +209,69 @@
                 transform: translateY(-2px);
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             }
-            .habit-btn:active {
-                transform: translateY(0);
-            }
         }
 
-        /* --- Log List --- */
+        /* --- CHART SECTION --- */
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s;
+        }
+
+        .chart-header {
+            margin: 0 0 20px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 120px; 
+            padding-bottom: 10px;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 14px;
+            background-color: var(--primary);
+            border-radius: 10px;
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 6px; 
+            opacity: 0.3; 
+        }
+
+        .bar.has-data { opacity: 1; }
+        .bar.completed { background-color: var(--success-text); }
+
+        .day-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* --- LOG LIST --- */
         .log-card {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 20px;
+            padding: 20px 20px 0 20px; /* Removed bottom padding for the button */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             flex-grow: 1;
+            transition: background-color 0.3s;
+            overflow: hidden; /* Contains the new button */
         }
 
         .log-header {
@@ -116,22 +280,12 @@
             align-items: center;
             margin-bottom: 16px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #f3f4f6;
+            border-bottom: 2px solid var(--bg);
         }
 
         .log-header h2 {
             margin: 0;
             font-size: 1.1rem;
-        }
-
-        .clear-btn {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 8px 0;
-            cursor: pointer;
         }
 
         .log-list {
@@ -145,7 +299,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid var(--bg);
             animation: slideIn 0.3s ease-out;
         }
 
@@ -187,22 +341,60 @@
             font-size: 0.9rem;
         }
 
+        /* Show More Button */
+        .show-more-btn {
+            width: 100%;
+            padding: 15px;
+            background: none;
+            border: none;
+            border-top: 1px solid var(--bg);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .show-more-btn:hover {
+            background-color: var(--bg);
+        }
+
     </style>
 </head>
-<body>
+<body data-theme="dark"> <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
+            <span id="theme-icon">☀️</span>
+        </button>
 
-    <div class="container">
-        <h1>Daily Tracker</h1>
+        <h1>Life Maxing</h1>
+
+        <div class="dashboard">
+            <div class="ring-container">
+                <svg class="progress-ring" width="160" height="160">
+                    <circle class="progress-ring__circle-bg" stroke-width="12" fill="transparent" r="66" cx="80" cy="80" stroke-linecap="round"/>
+                    <circle class="progress-ring__circle" stroke="#6366f1" stroke-width="12" fill="transparent" r="66" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="414.69 414.69" stroke-dashoffset="414.69"/>
+                </svg>
+                <div class="ring-content">
+                    <span class="ring-count" id="ring-count-display">0</span>
+                    <span class="ring-label">TODAY</span>
+                </div>
+            </div>
+            <div id="dashboard-message" class="dashboard-text">Log 3 habits to close the ring!</div>
+        </div>
 
         <div class="button-grid">
-            <button class="habit-btn" onclick="logHabit('Gym', '🏋️')">
-                <span class="emoji">🏋️</span>
-                <span>Gym</span>
+            <button class="habit-btn" onclick="logHabit('Physical Activity', '💪')">
+                <span class="emoji">💪</span>
+                <span>Physical Activity</span>
             </button>
-            <button class="habit-btn" onclick="logHabit('Run', '🏃')">
-                <span class="emoji">🏃</span>
-                <span>Run</span>
+            
+            <button class="habit-btn" onclick="logHabit('Learning Skill', '🧠')">
+                <span class="emoji">🧠</span>
+                <span>Learning Skill</span>
             </button>
+            
             <button class="habit-btn" onclick="logHabit('Stayed Disciplined', '🛡️')">
                 <span class="emoji">🛡️</span>
                 <span>Stayed Disciplined</span>
@@ -229,89 +421,254 @@
             </button>
         </div>
 
+        <div class="chart-card">
+            <h2 class="chart-header">Last 7 Days</h2>
+            <div id="weekly-chart" class="chart-container">
+                </div>
+        </div>
+
         <div class="log-card">
             <div class="log-header">
                 <h2>History</h2>
-                <button class="clear-btn" onclick="clearLog()">Reset</button>
-            </div>
-            
+                </div>
             <div id="empty-msg" class="empty-state">No habits logged yet.</div>
-            <ul id="log-list" class="log-list">
-                </ul>
+            <ul id="log-list" class="log-list"></ul>
+            
+            <button id="show-more-btn" class="show-more-btn" onclick="showMore()" style="display: none;">
+                Show More
+            </button>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhnsIMJi0UlOxdmLagAQfBDAmtZxl7LL8TW7ncohKDzdkopNx-KFgWf7OJKOiqbl8hew/exec"; // PASTE YOUR URL HERE
+        // YOUR SPECIFIC SCRIPT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhnsIMJi0UlOxdmLagAQfBDAmtZxl7LL8TW7ncohKDzdkopNx-KFgWf7OJKOiqbl8hew/exec"; 
 
-let habitLog = [];
-fetchLog(); // Load from Google Sheets on startup
+        let habitLog = [];
+        let visibleLimit = 5; // Limit history to 10 items initially
+        const DAILY_GOAL = 3;
+        const CIRCUMFERENCE = 2 * Math.PI * 66; 
 
-async function logHabit(name, icon) {
-    const now = new Date();
-    const newEntry = {
-        habit: name,
-        icon: icon,
-        dateString: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        timeString: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
+        // --- THEME LOGIC ---
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
 
-    // 1. Add to UI immediately for speed
-    habitLog.unshift(newEntry);
-    renderList();
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
 
-    // 2. Send to Google Sheets
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors', // Needed for Google Apps Script
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newEntry)
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            icon.innerText = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // --- TRACKER LOGIC ---
+
+        const cached = localStorage.getItem('myHabits');
+        if (cached) {
+            habitLog = JSON.parse(cached);
+            renderList();
+        }
+
+        fetchLog(); 
+
+        async function logHabit(name, icon) {
+            const now = new Date();
+            
+            // UI Object
+            const uiEntry = {
+                habit: name,
+                icon: icon,
+                dateString: now.toLocaleDateString('en-US'), 
+                timeString: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            };
+
+            // Sheet Payload (No Time)
+            const sheetPayload = {
+                habit: name,
+                icon: icon,
+                dateString: now.toLocaleDateString('en-US'), 
+                timeString: "" 
+            };
+
+            habitLog.unshift(uiEntry);
+            localStorage.setItem('myHabits', JSON.stringify(habitLog));
+            renderList();
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sheetPayload) 
+                });
+            } catch (e) {
+                console.error("Error saving to Sheets", e);
+            }
+        }
+
+        async function fetchLog() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                habitLog = data.reverse(); 
+                localStorage.setItem('myHabits', JSON.stringify(habitLog));
+                renderList();
+            } catch (e) {
+                console.error("Error fetching log", e);
+            }
+        }
+
+        function showMore() {
+            visibleLimit += 10; // Increase limit by 10
+            renderList();
+        }
+
+        function isToday(dateString) {
+            if (!dateString) return false;
+            const today = new Date();
+            const checkDate = new Date(dateString);
+            if (isNaN(checkDate.getTime())) return false;
+            return checkDate.getDate() === today.getDate() &&
+                   checkDate.getMonth() === today.getMonth() &&
+                   checkDate.getFullYear() === today.getFullYear();
+        }
+
+        function formatDisplayDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function updateDashboard() {
+            const todayCount = habitLog.filter(entry => isToday(entry.dateString)).length;
+
+            document.getElementById('ring-count-display').innerText = todayCount;
+            const msg = document.getElementById('dashboard-message');
+            const circle = document.querySelector('.progress-ring__circle');
+            
+            const currentTheme = document.body.getAttribute('data-theme');
+            const defaultRingColor = currentTheme === 'dark' ? '#818cf8' : '#6366f1';
+
+            if (todayCount >= DAILY_GOAL) {
+                msg.innerText = "Ring closed! Great job! 🎉";
+                msg.style.color = "var(--success-text)";
+                circle.style.stroke = "#059669";
+            } else {
+                const left = DAILY_GOAL - todayCount;
+                msg.innerText = `${left} more to close your ring`;
+                msg.style.color = "var(--text-muted)";
+                circle.style.stroke = defaultRingColor;
+            }
+
+            const progress = Math.min(todayCount / DAILY_GOAL, 1);
+            const offset = CIRCUMFERENCE - (progress * CIRCUMFERENCE);
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function renderChart() {
+            const chartContainer = document.getElementById('weekly-chart');
+            chartContainer.innerHTML = '';
+
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                last7Days.push(d);
+            }
+
+            const counts = {};
+            habitLog.forEach(entry => {
+                const d = new Date(entry.dateString);
+                if (!isNaN(d.getTime())) {
+                    const key = d.toLocaleDateString('en-US'); 
+                    counts[key] = (counts[key] || 0) + 1;
+                }
+            });
+
+            const maxVal = Math.max(5, ...Object.values(counts));
+
+            last7Days.forEach(dateObj => {
+                const dateKey = dateObj.toLocaleDateString('en-US');
+                const dayLabel = dateObj.toLocaleDateString('en-US', { weekday: 'narrow' }); 
+                
+                const count = counts[dateKey] || 0;
+                const heightPct = (count / maxVal) * 100;
+                
+                let barClass = 'bar';
+                if (count > 0) barClass += ' has-data';
+                if (count >= DAILY_GOAL) barClass += ' completed';
+
+                const html = `
+                    <div class="bar-group">
+                        <div class="${barClass}" style="height: ${heightPct}%"></div>
+                        <span class="day-label">${dayLabel}</span>
+                    </div>
+                `;
+                chartContainer.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderList() {
+            const list = document.getElementById('log-list');
+            const emptyMsg = document.getElementById('empty-msg');
+            const showMoreBtn = document.getElementById('show-more-btn');
+            
+            list.innerHTML = '';
+
+            // Run updates
+            updateDashboard();
+            renderChart();
+
+            if (habitLog.length === 0) {
+                emptyMsg.style.display = 'block';
+                showMoreBtn.style.display = 'none';
+                return;
+            }
+            emptyMsg.style.display = 'none';
+
+            // SLICE THE LOG based on visibleLimit
+            const visibleItems = habitLog.slice(0, visibleLimit);
+
+            visibleItems.forEach(entry => {
+                const li = document.createElement('li');
+                li.className = 'log-item';
+                
+                const displayDate = formatDisplayDate(entry.dateString);
+
+                li.innerHTML = `
+                    <div class="log-info">
+                        <span class="log-habit-name">${entry.icon} ${entry.habit}</span>
+                        <span class="log-date">${displayDate} ${entry.timeString ? '• ' + entry.timeString : ''}</span>
+                    </div>
+                    <div class="status-badge">DONE</div>
+                `;
+                list.appendChild(li);
+            });
+
+            // Show/Hide "Show More" Button
+            if (habitLog.length > visibleLimit) {
+                showMoreBtn.style.display = 'block';
+            } else {
+                showMoreBtn.style.display = 'none';
+            }
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type == "attributes" && mutation.attributeName == "data-theme") {
+                    updateDashboard();
+                }
+            });
         });
-    } catch (e) {
-        console.error("Error saving to Sheets", e);
-    }
-}
-
-async function fetchLog() {
-    try {
-        const response = await fetch(SCRIPT_URL);
-        const data = await response.json();
-        habitLog = data.reverse(); // Newest first
-        renderList();
-    } catch (e) {
-        console.error("Error fetching log", e);
-        // Fallback to local storage if internet fails
-        habitLog = JSON.parse(localStorage.getItem('myHabits')) || [];
-        renderList();
-    }
-}
-
-function renderList() {
-    const list = document.getElementById('log-list');
-    const emptyMsg = document.getElementById('empty-msg');
-    list.innerHTML = '';
-
-    if (habitLog.length === 0) {
-        emptyMsg.style.display = 'block';
-        return;
-    }
-    emptyMsg.style.display = 'none';
-
-    habitLog.forEach(entry => {
-        const li = document.createElement('li');
-        li.className = 'log-item';
-        li.innerHTML = `
-            <div class="log-info">
-                <span class="log-habit-name">${entry.icon} ${entry.habit}</span>
-                <span class="log-date">${entry.dateString} ${entry.timeString ? '• ' + entry.timeString : ''}</span>
-            </div>
-            <div class="status-badge">DONE</div>
-        `;
-        list.appendChild(li);
-    });
-}
+        observer.observe(document.body, { attributes: true });
     </script>
 </body>
 </html>
