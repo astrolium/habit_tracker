@@ -7,7 +7,7 @@
     <style>
         /* --- THEME VARIABLES --- */
         :root {
-            /* Light Theme (Original) */
+            /* Light Theme */
             --primary: #6366f1;
             --bg: #f3f4f6;
             --card-bg: #ffffff;
@@ -95,25 +95,32 @@
             transform: scale(1.1);
         }
 
-        /* --- DASHBOARD (RINGS) --- */
+        /* --- DASHBOARD (RING + CHART) --- */
         .dashboard {
             background: var(--card-bg);
             border-radius: 24px;
             padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Spread them out */
+            gap: 15px;
+        }
+
+        /* Left Side: Ring + Message */
+        .dashboard-left {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            transition: background-color 0.3s;
+            flex-shrink: 0; /* Prevent ring from shrinking */
         }
 
         .ring-container {
             position: relative;
-            width: 160px;
-            height: 160px;
-            margin-bottom: 12px;
+            width: 130px; 
+            height: 130px;
+            margin-bottom: 10px;
         }
 
         .progress-ring {
@@ -142,22 +149,73 @@
         }
 
         .ring-count {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 800;
             line-height: 1;
             color: var(--primary);
         }
 
         .ring-label {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             margin-top: 4px;
             font-weight: 600;
         }
 
         .dashboard-text {
-            font-size: 1rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Right Side: Mini Chart */
+        .dashboard-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 130px; /* Match ring height */
+            flex-grow: 1; /* Allow chart to fill remaining space */
+            max-width: 220px; /* Cap width so bars don't get too spread out */
+        }
+
+        .mini-chart-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Shared Bar Styles */
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 8px; /* Thinner bars for 7 days */
+            background-color: var(--primary);
+            border-radius: 10px;
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 6px; 
+            opacity: 0.3; 
+        }
+
+        .bar.has-data { opacity: 1; }
+        .bar.completed { background-color: var(--success-text); }
+
+        .day-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         /* --- BUTTON GRID --- */
@@ -211,67 +269,15 @@
             }
         }
 
-        /* --- CHART SECTION --- */
-        .chart-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.3s;
-        }
-
-        .chart-header {
-            margin: 0 0 20px 0;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .chart-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            height: 120px; 
-            padding-bottom: 10px;
-        }
-
-        .bar-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            height: 100%;
-            justify-content: flex-end;
-        }
-
-        .bar {
-            width: 14px;
-            background-color: var(--primary);
-            border-radius: 10px;
-            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 6px; 
-            opacity: 0.3; 
-        }
-
-        .bar.has-data { opacity: 1; }
-        .bar.completed { background-color: var(--success-text); }
-
-        .day-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
         /* --- LOG LIST --- */
         .log-card {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 20px 20px 0 20px; /* Removed bottom padding for the button */
+            padding: 20px 20px 0 20px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             flex-grow: 1;
             transition: background-color 0.3s;
-            overflow: hidden; /* Contains the new button */
+            overflow: hidden;
         }
 
         .log-header {
@@ -341,7 +347,6 @@
             font-size: 0.9rem;
         }
 
-        /* Show More Button */
         .show-more-btn {
             width: 100%;
             padding: 15px;
@@ -363,7 +368,8 @@
 
     </style>
 </head>
-<body data-theme="dark"> <div class="container">
+<body data-theme="dark"> 
+    <div class="container">
         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
             <span id="theme-icon">☀️</span>
         </button>
@@ -371,17 +377,24 @@
         <h1>Life Maxing</h1>
 
         <div class="dashboard">
-            <div class="ring-container">
-                <svg class="progress-ring" width="160" height="160">
-                    <circle class="progress-ring__circle-bg" stroke-width="12" fill="transparent" r="66" cx="80" cy="80" stroke-linecap="round"/>
-                    <circle class="progress-ring__circle" stroke="#6366f1" stroke-width="12" fill="transparent" r="66" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="414.69 414.69" stroke-dashoffset="414.69"/>
-                </svg>
-                <div class="ring-content">
-                    <span class="ring-count" id="ring-count-display">0</span>
-                    <span class="ring-label">TODAY</span>
+            <div class="dashboard-left">
+                <div class="ring-container">
+                    <svg class="progress-ring" width="130" height="130">
+                        <circle class="progress-ring__circle-bg" stroke-width="10" fill="transparent" r="54" cx="65" cy="65" stroke-linecap="round"/>
+                        <circle class="progress-ring__circle" stroke="#6366f1" stroke-width="10" fill="transparent" r="54" cx="65" cy="65" stroke-linecap="round" stroke-dasharray="339.29 339.29" stroke-dashoffset="339.29"/>
+                    </svg>
+                    <div class="ring-content">
+                        <span class="ring-count" id="ring-count-display">0</span>
+                        <span class="ring-label">TODAY</span>
+                    </div>
                 </div>
+                <div id="dashboard-message" class="dashboard-text">Log 3 habits!</div>
             </div>
-            <div id="dashboard-message" class="dashboard-text">Log 3 habits to close the ring!</div>
+
+            <div class="dashboard-right">
+                <div id="mini-chart" class="mini-chart-container">
+                    </div>
+            </div>
         </div>
 
         <div class="button-grid">
@@ -421,16 +434,10 @@
             </button>
         </div>
 
-        <div class="chart-card">
-            <h2 class="chart-header">Last 7 Days</h2>
-            <div id="weekly-chart" class="chart-container">
-                </div>
-        </div>
-
         <div class="log-card">
             <div class="log-header">
                 <h2>History</h2>
-                </div>
+            </div>
             <div id="empty-msg" class="empty-state">No habits logged yet.</div>
             <ul id="log-list" class="log-list"></ul>
             
@@ -441,13 +448,13 @@
     </div>
 
     <script>
-        // YOUR SPECIFIC SCRIPT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhnsIMJi0UlOxdmLagAQfBDAmtZxl7LL8TW7ncohKDzdkopNx-KFgWf7OJKOiqbl8hew/exec"; 
 
         let habitLog = [];
-        let visibleLimit = 5; // Limit history to 10 items initially
+        let visibleLimit = 5; 
         const DAILY_GOAL = 3;
-        const CIRCUMFERENCE = 2 * Math.PI * 66; 
+        // Updated circumference for r=54 (2 * pi * 54)
+        const CIRCUMFERENCE = 2 * Math.PI * 54; 
 
         // --- THEME LOGIC ---
         const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -457,7 +464,6 @@
         function toggleTheme() {
             const current = document.body.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
-            
             document.body.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             updateThemeIcon(next);
@@ -469,7 +475,6 @@
         }
 
         // --- TRACKER LOGIC ---
-
         const cached = localStorage.getItem('myHabits');
         if (cached) {
             habitLog = JSON.parse(cached);
@@ -480,16 +485,12 @@
 
         async function logHabit(name, icon) {
             const now = new Date();
-            
-            // UI Object
             const uiEntry = {
                 habit: name,
                 icon: icon,
                 dateString: now.toLocaleDateString('en-US'), 
                 timeString: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
             };
-
-            // Sheet Payload (No Time)
             const sheetPayload = {
                 habit: name,
                 icon: icon,
@@ -527,7 +528,7 @@
         }
 
         function showMore() {
-            visibleLimit += 10; // Increase limit by 10
+            visibleLimit += 10; 
             renderList();
         }
 
@@ -558,12 +559,12 @@
             const defaultRingColor = currentTheme === 'dark' ? '#818cf8' : '#6366f1';
 
             if (todayCount >= DAILY_GOAL) {
-                msg.innerText = "Ring closed! Great job! 🎉";
+                msg.innerText = "Ring closed! 🎉";
                 msg.style.color = "var(--success-text)";
                 circle.style.stroke = "#059669";
             } else {
                 const left = DAILY_GOAL - todayCount;
-                msg.innerText = `${left} more to close your ring`;
+                msg.innerText = `${left} to go`;
                 msg.style.color = "var(--text-muted)";
                 circle.style.stroke = defaultRingColor;
             }
@@ -574,9 +575,10 @@
         }
 
         function renderChart() {
-            const chartContainer = document.getElementById('weekly-chart');
+            const chartContainer = document.getElementById('mini-chart');
             chartContainer.innerHTML = '';
 
+            // Generate last 7 days
             const last7Days = [];
             for (let i = 6; i >= 0; i--) {
                 const d = new Date();
@@ -593,7 +595,8 @@
                 }
             });
 
-            const maxVal = Math.max(5, ...Object.values(counts));
+            // Find Max for scaling (Minimum 3 for nice visual)
+            const maxVal = Math.max(3, ...Object.values(counts));
 
             last7Days.forEach(dateObj => {
                 const dateKey = dateObj.toLocaleDateString('en-US');
@@ -623,7 +626,6 @@
             
             list.innerHTML = '';
 
-            // Run updates
             updateDashboard();
             renderChart();
 
@@ -634,7 +636,6 @@
             }
             emptyMsg.style.display = 'none';
 
-            // SLICE THE LOG based on visibleLimit
             const visibleItems = habitLog.slice(0, visibleLimit);
 
             visibleItems.forEach(entry => {
@@ -653,7 +654,6 @@
                 list.appendChild(li);
             });
 
-            // Show/Hide "Show More" Button
             if (habitLog.length > visibleLimit) {
                 showMoreBtn.style.display = 'block';
             } else {
