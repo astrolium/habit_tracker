@@ -70,11 +70,17 @@
             color: var(--header-color);
         }
 
-        /* --- THEME TOGGLE --- */
-        .theme-toggle {
+        /* --- HEADER CONTROLS (THEME + SHEET LINK) --- */
+        .header-controls {
             position: absolute;
             top: 0;
             right: 0;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .control-btn {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-main);
@@ -88,11 +94,12 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             font-size: 1.2rem;
             transition: all 0.3s ease;
-            z-index: 10;
+            text-decoration: none; /* For anchor tags */
         }
 
-        .theme-toggle:hover {
+        .control-btn:hover {
             transform: scale(1.1);
+            background-color: var(--btn-hover);
         }
 
         /* --- DASHBOARD (RING + CHART) --- */
@@ -370,9 +377,14 @@
 </head>
 <body data-theme="dark"> 
     <div class="container">
-        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
-            <span id="theme-icon">☀️</span>
-        </button>
+        <div class="header-controls">
+            <a href="https://docs.google.com/spreadsheets/d/1r4N0QVTaLBhuRGp8O3aqcbVEmpQ90tKZ_QcaWhrofnA/edit?gid=0#gid=0" target="_blank" class="control-btn" aria-label="Open Google Sheet">
+                📊
+            </a>
+            <button class="control-btn" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
+                <span id="theme-icon">☀️</span>
+            </button>
+        </div>
 
         <h1>Life Maxing</h1>
 
